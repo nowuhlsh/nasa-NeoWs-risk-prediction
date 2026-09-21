@@ -35,7 +35,7 @@ def fetch_dates_asteroids(date):
     #JSON to Python dict
     data = response.json()
 
-    #handling missing days
+    #handling missing days 
     if date in data["near_earth_objects"]:
         asteroids = data["near_earth_objects"][date]
     else:
@@ -43,15 +43,17 @@ def fetch_dates_asteroids(date):
 
     return asteroids
 
-#Function to extract data in nested JSON format into simple dict
+#function to extract data in nested JSON format into simple dict
 def asteroid_data_extract(asteroids):
 #1 asteroid can have many close approach events, want to extract all of them
     records = []
     for asteroid in asteroids:
         for approach in asteroid["close_approach_data"]:
-            #Keep certain features as documented in project notes
+            #keep certain features as documented in project notes
             record = {
-                #Asteroid specifics
+                #adding unique key for each entry, so that SQL can handle dupes
+                "event_id": f"{asteroid['id']}_{approach['close_approach_date_full']}",
+                #asteroid specifics
                 "asteroid_id": asteroid["id"],
                 "name": asteroid["name"],
                 "absolute_magnitude_h": asteroid["absolute_magnitude_h"],
@@ -65,7 +67,7 @@ def asteroid_data_extract(asteroids):
                 "is_potentially_hazardous": asteroid["is_potentially_hazardous_asteroid"],
                 "is_sentry_object": asteroid["is_sentry_object"],
 
-                #Close-approach info
+                #close-approach info
                 "close_approach_date": approach["close_approach_date"],
                 "close_approach_date_full": approach["close_approach_date_full"],
                 "relative_velocity_km_s": approach["relative_velocity"]["kilometers_per_second"],
@@ -75,18 +77,18 @@ def asteroid_data_extract(asteroids):
             records.append(record)
     return records
 
-#Turn return records into panda DataFrame
+#turn return records into panda DataFrame
 def rec_to_df(records):
     df = pd.DataFrame(records)
     return df
 
-#Function to extract data over a time period, into a dataframe
+#function to extract data over a time period, into a dataframe
 def fetch_daterange_asteroids(start, end):
     all_records =[]
     current_date = date.fromisoformat(start)
     end_date = date.fromisoformat(end)
 
-    #for progress purposes
+    #for progress markers
     total_days = (end_date - current_date).days + 1
     complete_days = 0
     empty_day_count = 0
@@ -95,8 +97,14 @@ def fetch_daterange_asteroids(start, end):
 
     while current_date <= end_date:
         date_string = current_date.isoformat()
-        asteroids = fetch_dates_asteroids(date_string)
-        #Want to be aware of days with no events: won't confuse them with missing datas
+        #on what day API req fails
+        try:
+            asteroids = fetch_dates_asteroids(date_string)
+        except Exception as error:
+            raise RuntimeError(
+                f"API request failed for {date_string}"
+            ) from error
+        #want to be aware of days with no events: won't confuse them with missing data
         if asteroids == []:
             empty_day_count += 1
             empty_days.append(date_string)
@@ -105,14 +113,10 @@ def fetch_daterange_asteroids(start, end):
         current_date += timedelta(days=1)
         #adding progress checker
         complete_days += 1
-        #need to do in ints to avoid decimal problems like 0.51 etc
         percent = int((complete_days / total_days) * 100)
         if percent in progress_markers:
             print(f"{percent}% complete...")
             #stops multiple lines being printed in large data sets
             progress_markers.remove(percent)
-
-    print(f"Days processed: {complete_days} / {total_days}")
-    print(f"Number of empty days: {empty_day_count}")
-    print(f"Empty days: {empty_days}")
+    print(f"{start} to {end} \n Days processed: {complete_days} / {total_days}")
     return rec_to_df(all_records)

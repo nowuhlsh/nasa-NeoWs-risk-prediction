@@ -13,13 +13,23 @@ def standardise_asteroid_data(df):
 def asteroid_data_report(df):
     #creates a report on data to validate before adding to db
     report = { 
-        "No. of missing values": df.isna().sum(),
+        "No. of missing values": df.isna().sum().sum(),
         "Negative relative velocity": (df["relative_velocity_km_s"] < 0).sum(),
         "Negative miss distance" : (df['miss_distance_au'] < 0).sum(),
         "Negative min. diameter": (df['diameter_min_km'] < 0).sum(),
         "Negative max. diameter": (df['diameter_max_km'] < 0).sum()
     }
     return report
+
+#function sees if report is valid, will raises error if not
+def validate_report(report):
+    for value in report.values():
+        if value > 0:
+            raise ValueError(
+                "Validation failed: report contains anomaly"
+            )
+    
+
 
 
 

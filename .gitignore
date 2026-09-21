@@ -1,8 +1,9 @@
 # personals
 project_notes.txt
 .vscode/
+data/
 # notebooks to omit
-notebooks/01_data_and_function_checks.ipynb
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
