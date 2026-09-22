@@ -2,9 +2,6 @@
 project_notes.txt
 .vscode/
 data/
-# notebooks to omit
-notebooks/01_data_exploration.ipynb
-notebooks/02_database_insertion.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
