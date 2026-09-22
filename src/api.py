@@ -77,7 +77,7 @@ def asteroid_data_extract(asteroids):
             records.append(record)
     return records
 
-#turn return records into panda DataFrame
+#function to turn return records into panda DataFrame
 def rec_to_df(records):
     df = pd.DataFrame(records)
     return df
@@ -114,9 +114,10 @@ def fetch_daterange_asteroids(start, end):
         #adding progress checker
         complete_days += 1
         percent = int((complete_days / total_days) * 100)
-        if percent in progress_markers:
-            print(f"{percent}% complete...")
-            #stops multiple lines being printed in large data sets
-            progress_markers.remove(percent)
-    print(f"{start} to {end} \n Days processed: {complete_days} / {total_days}")
+        for marker in progress_markers.copy():
+            #once it crosses a marker, print marker and remove it. copy() ensures no errors whilst looping
+            if percent >= marker:
+                print(f"{marker}% complete...")
+                progress_markers.remove(marker)
+    print(f"{start} to {end}, Days processed: {complete_days} / {total_days}")
     return rec_to_df(all_records)

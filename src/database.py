@@ -2,6 +2,7 @@ import sqlite3
 import calendar
 
 c = sqlite3.connect("data/nasa_asteroids.db")
+
 #creating close approach table
 with open("sql/schema.sql") as file:
     schema = file.read()
@@ -45,7 +46,7 @@ def get_dates(month, year):
     end_date = f"{year:04d}-{month:02d}-{final_day:02d}"
     return start_date, end_date
 
-#gets start/end dates for months in a time period
+#function gets start/end dates for months in a time period
 def get_period_dates(start_month, start_year, end_month, end_year):
     dates = []
     for year in range(start_year, end_year + 1):

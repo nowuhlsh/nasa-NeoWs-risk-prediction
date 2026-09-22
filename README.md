@@ -1,5 +1,8 @@
 # nasa-NeoWs-risk-prediction
 
-w.i.p program using NASA NeoWs API to analyse asteroid's potential risk with EDA and anomalities using machine learning.
+Work in progress program using NASA NeoWs API to analyse asteroid's potential risk with EDA and anomalities using machine learning.
+Notebooks depict my work on a historical dataset, with the aim to expand this to automation upon completion.
 
-aim: associate a 'risk score' with an asteroid and a anomality rating
+Data is obtained from NASA NeoWs API.
+
+To obtain a NASA API key, please visit https://api.nasa.gov/.

@@ -1,5 +1,6 @@
 import pandas as pd
 
+#function to convert to correct units in dataframe
 def standardise_asteroid_data(df):
     s_df = df.copy()
     #str to numeric
@@ -10,8 +11,9 @@ def standardise_asteroid_data(df):
     s_df["close_approach_date_full"] = pd.to_datetime(s_df["close_approach_date_full"], errors = "coerce")
     return s_df
 
+#function to create report on data for validation
 def asteroid_data_report(df):
-    #creates a report on data to validate before adding to db
+    #checks for missing values, and invalid data
     report = { 
         "No. of missing values": df.isna().sum().sum(),
         "Negative relative velocity": (df["relative_velocity_km_s"] < 0).sum(),
@@ -21,7 +23,7 @@ def asteroid_data_report(df):
     }
     return report
 
-#function sees if report is valid, will raises error if not
+#function validates report or raises error
 def validate_report(report):
     for value in report.values():
         if value > 0:
